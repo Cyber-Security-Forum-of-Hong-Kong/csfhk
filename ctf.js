@@ -16,9 +16,9 @@ function saveCompletedChallenges() {
     localStorage.setItem('csfhk_completed', JSON.stringify(completedChallenges));
 }
 
-// Flag 混淆和還原函數
+
 function obfuscateFlag(flag) {
-    // 使用多層混淆：Base64 + 字符位移 + 反轉
+
     const step1 = btoa(flag);
     const step2 = step1.split('').map(c => String.fromCharCode(c.charCodeAt(0) + 5)).join('');
     const step3 = step2.split('').reverse().join('');
@@ -36,7 +36,7 @@ function deobfuscateFlag(obfuscated) {
     }
 }
 
-// 動態生成隱藏註釋
+
 function addHiddenFlagComment() {
     const flagCodes = [67, 83, 70, 72, 75, 123, 104, 105, 100, 100, 101, 110, 95, 105, 110, 95, 115, 111, 117, 114, 99, 101, 125];
     const flagString = String.fromCharCode(...flagCodes);
@@ -45,7 +45,6 @@ function addHiddenFlagComment() {
 }
 
 function initializeCTFChallenges() {
-    // 混淆的 flag 數據
     const obfuscatedFlags = {
         1: "WlpoZlptSk1KVDJMV3B1VkdLQVV5dGtUeWtBSG1xcWFaWFk=",
         2: "Wm1Ga1kyRXdNVEE0WVRBMU1qaFpZbVJqWmpGaFlqVTVNVEk1TURjMFlqYzVNV1E0TkRReE1ERmhaR1ppTm1RM01XUTRNRFEwWmpVNU5ERTVOamxsTXpVNVpEQmxNV1pqWm1OalpqaGlaV05sTXpWaU5tSTJNREk1TURjNFpqSm1ObVps",
