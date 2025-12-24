@@ -16,76 +16,13 @@ function saveCompletedChallenges() {
     localStorage.setItem('csfhk_completed', JSON.stringify(completedChallenges));
 }
 
-
-function obfuscateFlag(flag) {
-
-    const step1 = btoa(flag);
-    const step2 = step1.split('').map(c => String.fromCharCode(c.charCodeAt(0) + 5)).join('');
-    const step3 = step2.split('').reverse().join('');
-    return btoa(step3);
-}
-
-function deobfuscateFlag(obfuscated) {
-    try {
-        const step1 = atob(obfuscated);
-        const step2 = step1.split('').reverse().join('');
-        const step3 = step2.split('').map(c => String.fromCharCode(c.charCodeAt(0) - 5)).join('');
-        return atob(step3);
-    } catch (e) {
-        return '';
-    }
-}
-
-
-function addHiddenFlagComment() {
-    const flagCodes = [67, 83, 70, 72, 75, 123, 104, 105, 100, 100, 101, 110, 95, 105, 110, 95, 115, 111, 117, 114, 99, 101, 125];
-    const flagString = String.fromCharCode(...flagCodes);
-    const comment = document.createComment(flagString);
-    document.documentElement.appendChild(comment);
-}
-
 function initializeCTFChallenges() {
-    const obfuscatedFlags = {
-        1: "WlpoZlptSk1KVDJMV3B1VkdLQVV5dGtUeWtBSG1xcWFaWFk=",
-        2: "Wm1Ga1kyRXdNVEE0WVRBMU1qaFpZbVJqWmpGaFlqVTVNVEk1TURjMFlqYzVNV1E0TkRReE1ERmhaR1ppTm1RM01XUTRNRFEwWmpVNU5ERTVOamxsTXpVNVpEQmxNV1pqWm1OalpqaGlaV05sTXpWaU5tSTJNREk1TURjNFpqSm1ObVps",
-        3: "Wm1GalkyUXhOVE01TVRJM01qZzNZV1JqWXpJNE5qRTFOV1pqTWpBNU1XUTVZemMwWXpBMVpUQmhOV001TlRZek56RTJNREk0TURBd056QXdOV1psWm1aa01UazJZVFZqTVRnNE9URTBaakF3WlRjNU9UazJaVFZoT1RnM1pETTVNR1U1WVRRMU5ETTBNR1F4TWpVM1lXUXlaRGxtTnpRM01UVmhOakZtWlRBMk5qaGpPVGcxT1RaaU5tUTNZbVUz",
-        4: "Wm1Ga1kyRXdNVE01TWpBeFltRm1aVEUyTkRJM05qZzJZVFJqTkdGaU5qQTNPR1E1TlRJMk9HTTBaakl6TkdGaU5qQTNPR1E1TlRJMk9HTTBaakl6TkdGaU5qQTNPR1E1TlRJMk9HTTBaakl6TkdGaU5qQTNPR1E1TlRJMk9HTTBaakl6TkdGaU5qQTNPR1E1TlRJMk9HTTBaakl6",
-        5: "Wm1Ga1kyRXdNVE01TWpBeFltRm1aVEUyTkRJM05qZzJZVFJqTkdGaU5qQTNPR1E1TlRJMk9HTTBaakl6TkdGaU5qQTNPR1E1TlRJMk9HTTBaakl6TkdGaU5qQTNPR1E1TlRJMk9HTTBaakl6TkdGaU5qQTNPR1E1TlRJMk9HTTBaakl6",
-        6: "Wm1Ga1kyRXdNVE01TWpBeFltRm1aVEUyTkRJM05qZzJZVFJqTkdGaU5qQTNPR1E1TlRJMk9HTTBaakl6TkdGaU5qQTNPR1E1TlRJMk9HTTBaakl6TkdGaU5qQTNPR1E1TlRJMk9HTTBaakl6",
-        7: "Wm1Ga1kyRXdNVE01TWpBeFltRm1aVEUyTkRJM05qZzJZVFJqTkdGaU5qQTNPR1E1TlRJMk9HTTBaakl6TkdGaU5qQTNPR1E1TlRJMk9HTTBaakl6",
-        8: "Wm1Ga1kyRXdNVE01TWpBeFltRm1aVEUyTkRJM05qZzJZVFJqTkdGaU5qQTNPR1E1TlRJMk9HTTBaakl6",
-        9: "Wm1Ga1kyRXdNVE01TWpBeFltRm1aVEUyTkRJM05qZzJZVFJqTkdGaU5qQTNPR1E1TlRJMk9HTTBaakl6TkdGaU5qQTNPR1E1TlRJMk9HTTBaakl6TkdGaU5qQTNPR1E1TlRJMk9HTTBaakl6TkdGaU5qQTNPR1E1TlRJMk9HTTBaakl6TkdGaU5qQTNPR1E1TlRJMk9HTTBaakl6",
-        10: "Wm1Ga1kyRXdNVE01TWpBeFltRm1aVEUyTkRJM05qZzJZVFJqTkdGaU5qQTNPR1E1TlRJMk9HTTBaakl6TkdGaU5qQTNPR1E1TlRJMk9HTTBaakl6TkdGaU5qQTNPR1E1TlRJMk9HTTBaakl6",
-        11: "Wm1Ga1kyRXdNVE01TWpBeFltRm1aVEUyTkRJM05qZzJZVFJqTkdGaU5qQTNPR1E1TlRJMk9HTTBaakl6TkdGaU5qQTNPR1E1TlRJMk9HTTBaakl6TkdGaU5qQTNPR1E1TlRJMk9HTTBaakl6",
-        12: "Wm1Ga1kyRXdNVE01TWpBeFltRm1aVEUyTkRJM05qZzJZVFJqTkdGaU5qQTNPR1E1TlRJMk9HTTBaakl6TkdGaU5qQTNPR1E1TlRJMk9HTTBaakl6",
-        13: "Wm1Ga1kyRXdNVE01TWpBeFltRm1aVEUyTkRJM05qZzJZVFJqTkdGaU5qQTNPR1E1TlRJMk9HTTBaakl6TkdGaU5qQTNPR1E1TlRJMk9HTTBaakl6TkdGaU5qQTNPR1E1TlRJMk9HTTBaakl6",
-        14: "Wm1Ga1kyRXdNVE01TWpBeFltRm1aVEUyTkRJM05qZzJZVFJqTkdGaU5qQTNPR1E1TlRJMk9HTTBaakl6TkdGaU5qQTNPR1E1TlRJMk9HTTBaakl6",
-        15: "Wm1Ga1kyRXdNVE01TWpBeFltRm1aVEUyTkRJM05qZzJZVFJqTkdGaU5qQTNPR1E1TlRJMk9HTTBaakl6TkdGaU5qQTNPR1E1TlRJMk9HTTBaakl6TkdGaU5qQTNPR1E1TlRJMk9HTTBaakl6",
-        16: "Wm1Ga1kyRXdNVE01TWpBeFltRm1aVEUyTkRJM05qZzJZVFJqTkdGaU5qQTNPR1E1TlRJMk9HTTBaakl6TkdGaU5qQTNPR1E1TlRJMk9HTTBaakl6",
-        17: "Wm1Ga1kyRXdNVE01TWpBeFltRm1aVEUyTkRJM05qZzJZVFJqTkdGaU5qQTNPR1E1TlRJMk9HTTBaakl6TkdGaU5qQTNPR1E1TlRJMk9HTTBaakl6TkdGaU5qQTNPR1E1TlRJMk9HTTBaakl6",
-        18: "Wm1Ga1kyRXdNVE01TWpBeFltRm1aVEUyTkRJM05qZzJZVFJqTkdGaU5qQTNPR1E1TlRJMk9HTTBaakl6TkdGaU5qQTNPR1E1TlRJMk9HTTBaakl6",
-        19: "Wm1Ga1kyRXdNVE01TWpBeFltRm1aVEUyTkRJM05qZzJZVFJqTkdGaU5qQTNPR1E1TlRJMk9HTTBaakl6TkdGaU5qQTNPR1E1TlRJMk9HTTBaakl6TkdGaU5qQTNPR1E1TlRJMk9HTTBaakl6",
-        20: "Wm1Ga1kyRXdNVE01TWpBeFltRm1aVEUyTkRJM05qZzJZVFJqTkdGaU5qQTNPR1E1TlRJMk9HTTBaakl6TkdGaU5qQTNPR1E1TlRJMk9HTTBaakl6",
-        21: "Wm1Ga1kyRXdNVE01TWpBeFltRm1aVEUyTkRJM05qZzJZVFJqTkdGaU5qQTNPR1E1TlRJMk9HTTBaakl6TkdGaU5qQTNPR1E1TlRJMk9HTTBaakl6TkdGaU5qQTNPR1E1TlRJMk9HTTBaakl6",
-        22: "Wm1Ga1kyRXdNVE01TWpBeFltRm1aVEUyTkRJM05qZzJZVFJqTkdGaU5qQTNPR1E1TlRJMk9HTTBaakl6TkdGaU5qQTNPR1E1TlRJMk9HTTBaakl6",
-        23: "Wm1Ga1kyRXdNVE01TWpBeFltRm1aVEUyTkRJM05qZzJZVFJqTkdGaU5qQTNPR1E1TlRJMk9HTTBaakl6TkdGaU5qQTNPR1E1TlRJMk9HTTBaakl6TkdGaU5qQTNPR1E1TlRJMk9HTTBaakl6",
-        24: "Wm1Ga1kyRXdNVE01TWpBeFltRm1aVEUyTkRJM05qZzJZVFJqTkdGaU5qQTNPR1E1TlRJMk9HTTBaakl6TkdGaU5qQTNPR1E1TlRJMk9HTTBaakl6",
-        25: "Wm1Ga1kyRXdNVE01TWpBeFltRm1aVEUyTkRJM05qZzJZVFJqTkdGaU5qQTNPR1E1TlRJMk9HTTBaakl6TkdGaU5qQTNPR1E1TlRJMk9HTTBaakl6TkdGaU5qQTNPR1E1TlRJMk9HTTBaakl6",
-        26: "Wm1Ga1kyRXdNVE01TWpBeFltRm1aVEUyTkRJM05qZzJZVFJqTkdGaU5qQTNPR1E1TlRJMk9HTTBaakl6TkdGaU5qQTNPR1E1TlRJMk9HTTBaakl6",
-        27: "Wm1Ga1kyRXdNVE01TWpBeFltRm1aVEUyTkRJM05qZzJZVFJqTkdGaU5qQTNPR1E1TlRJMk9HTTBaakl6TkdGaU5qQTNPR1E1TlRJMk9HTTBaakl6TkdGaU5qQTNPR1E1TlRJMk9HTTBaakl6",
-        28: "Wm1Ga1kyRXdNVE01TWpBeFltRm1aVEUyTkRJM05qZzJZVFJqTkdGaU5qQTNPR1E1TlRJMk9HTTBaakl6TkdGaU5qQTNPR1E1TlRJMk9HTTBaakl6",
-        29: "Wm1Ga1kyRXdNVE01TWpBeFltRm1aVEUyTkRJM05qZzJZVFJqTkdGaU5qQTNPR1E1TlRJMk9HTTBaakl6TkdGaU5qQTNPR1E1TlRJMk9HTTBaakl6TkdGaU5qQTNPR1E1TlRJMk9HTTBaakl6",
-        30: "Wm1Ga1kyRXdNVE01TWpBeFltRm1aVEUyTkRJM05qZzJZVFJqTkdGaU5qQTNPR1E1TlRJMk9HTTBaakl6TkdGaU5qQTNPR1E1TlRJMk9HTTBaakl6",
-        31: "Wm1Ga1kyRXdNVE01TWpBeFltRm1aVEUyTkRJM05qZzJZVFJqTkdGaU5qQTNPR1E1TlRJMk9HTTBaakl6TkdGaU5qQTNPR1E1TlRJMk9HTTBaakl6TkdGaU5qQTNPR1E1TlRJMk9HTTBaakl6"
-    };
-
     ctfChallenges = [
         {
             id: 1,
             category: 'web',
             title: 'Hidden Flag',
             description: 'Flag隱藏在這個頁面的源代碼中，你能找到它嗎？提示：查看HTML註釋。',
-            flag: obfuscatedFlags[1],
             difficulty: 'easy',
             points: 10,
             hint: '右鍵點擊頁面，選擇"查看頁面源代碼"或按F12查看開發者工具'
@@ -95,7 +32,6 @@ function initializeCTFChallenges() {
             category: 'web',
             title: 'Base64 Encode',
             description: '解碼這段Base64編碼的文字：Q1NGSEst{eG9uZ19rb25nX2ZvcnVt}',
-            flag: obfuscatedFlags[2],
             difficulty: 'easy',
             points: 10,
             hint: '使用在線Base64解碼工具或JavaScript atob()函數'
@@ -105,7 +41,6 @@ function initializeCTFChallenges() {
             category: 'crypto',
             title: 'Caesar Cipher',
             description: '解碼這段凱撒密碼（移位3）：FVIKN{oryh_qhw_zrun}',
-            flag: obfuscatedFlags[3],
             difficulty: 'easy',
             points: 15,
             hint: '每個字母向前移動3個位置（解密時向後移動3個位置）'
@@ -115,7 +50,6 @@ function initializeCTFChallenges() {
             category: 'crypto',
             title: 'ROT13 Challenge',
             description: '解碼這段ROT13編碼：PFSUX{uryyb_plorefrphevgl}',
-            flag: obfuscatedFlags[4],
             difficulty: 'easy',
             points: 15,
             hint: 'ROT13是每個字母移動13個位置的凱撒密碼（加密和解密相同）'
@@ -125,7 +59,6 @@ function initializeCTFChallenges() {
             category: 'misc',
             title: 'Flag in Console',
             description: '打開瀏覽器的開發者工具（F12），在控制台（Console）中輸入：getFlag() 然後按Enter',
-            flag: obfuscatedFlags[5],
             difficulty: 'easy',
             points: 10,
             hint: '按F12打開開發者工具，切換到Console標籤，然後輸入getFlag()'
@@ -135,7 +68,6 @@ function initializeCTFChallenges() {
             category: 'misc',
             title: 'Hexadecimal Decode',
             description: '將這段十六進制轉換為文字：435346484B7B6865785F6465636F64657D',
-            flag: obfuscatedFlags[6],
             difficulty: 'easy',
             points: 15,
             hint: '每兩個十六進制字符代表一個ASCII字符'
@@ -145,7 +77,6 @@ function initializeCTFChallenges() {
             category: 'web',
             title: 'Cookie Challenge',
             description: '設置一個名為"secret_flag"的Cookie，值為"CSFHK-cookie_master"，然後重新加載頁面。提示：使用JavaScript document.cookie設置。',
-            flag: obfuscatedFlags[7],
             difficulty: 'medium',
             points: 20,
             hint: '在控制台執行: document.cookie = "secret_flag=CSFHK-cookie_master"'
@@ -155,7 +86,6 @@ function initializeCTFChallenges() {
             category: 'crypto',
             title: 'Binary to Text',
             description: '將這段二進制轉換為文字：01000011 01010011 01000110 01001000 01001011 01111011 01100010 01101001 01101110 01100001 01110010 01111001 01111101',
-            flag: obfuscatedFlags[8],
             difficulty: 'medium',
             points: 20,
             hint: '每8位二進制數代表一個ASCII字符'
@@ -165,7 +95,6 @@ function initializeCTFChallenges() {
             category: 'forensics',
             title: 'Image Metadata',
             description: '查看這張圖片的EXIF數據，flag在相機製造商字段中：data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjx0ZXh0IHg9IjEwIiB5PSI1MCIgZm9udC1zaXplPSIyMCI+Q1NGSEst{eXhpZl9kYXRhfTwvdGV4dD48L3N2Zz4=',
-            flag: obfuscatedFlags[9],
             difficulty: 'medium',
             points: 25,
             hint: '某些圖片包含隱藏的元數據'
@@ -175,7 +104,6 @@ function initializeCTFChallenges() {
             category: 'web',
             title: 'JavaScript Obfuscation',
             description: '這段JavaScript代碼被混淆了，你能執行它並找到flag嗎？在控制台執行：eval(atob("Y29uc29sZS5sb2coJ0NTRktILXtzY3JpcHRfb2JmdXNjYXRpb259Jyk7"))',
-            flag: obfuscatedFlags[10],
             difficulty: 'medium',
             points: 25,
             hint: '在瀏覽器控制台中複製並運行這段代碼'
@@ -185,7 +113,6 @@ function initializeCTFChallenges() {
             category: 'reverse',
             title: 'Packed XOR',
             description: '以下十六進制數據代表一段被XOR加密的文字，使用密鑰0x37解密並提交flag：525343465b0d445140155b0c5b1b414c4415595d0d17411b1b5a',
-            flag: obfuscatedFlags[11],
             difficulty: 'hard',
             points: 40,
             hint: '將hex轉byte，每個byte與0x37異或後轉ASCII'
@@ -195,7 +122,6 @@ function initializeCTFChallenges() {
             category: 'pwn',
             title: 'Format String Leak',
             description: '本題flag格式為CSFHK{format_string}. 典型printf("%s")漏洞可使用%s連續輸出棧內容，請推測flag並提交。',
-            flag: obfuscatedFlags[12],
             difficulty: 'hard',
             points: 45,
             hint: 'CTF常見格式化字符串利用，flag已知格式，可直接提交'
@@ -205,7 +131,6 @@ function initializeCTFChallenges() {
             category: 'misc',
             title: 'Layered Base',
             description: '這串字串被連續三次Base64編碼，解開它：QzFHRUhLe0IxbmFyeV9iNHNlbTY0X2YwbjB0X2gxZDFuXzNOMV0=',
-            flag: obfuscatedFlags[13],
             difficulty: 'hard',
             points: 35,
             hint: '連續解三次Base64，注意大小寫與字元'
@@ -215,7 +140,6 @@ function initializeCTFChallenges() {
             category: 'crypto',
             title: 'Vigenère Cipher',
             description: '解碼這段維吉尼亞密碼，密鑰是"HONGKONG"：\nJGSNU{jvmlbrxo_qvvose}',
-            flag: obfuscatedFlags[14],
             difficulty: 'hard',
             points: 40,
             hint: '維吉尼亞密碼使用多字母替換，需要對每個字母使用對應的密鑰字母進行凱撒密碼解密'
@@ -225,7 +149,6 @@ function initializeCTFChallenges() {
             category: 'crypto',
             title: 'Rail Fence Cipher',
             description: '解碼這段欄柵密碼（Rail Fence，3行）：\n讀取順序：第1行、第2行、第3行\n密文：C_K_LH_OK{_s_er_ou_g}\n按3行欄柵密碼規則重新排列',
-            flag: obfuscatedFlags[15],
             difficulty: 'hard',
             points: 35,
             hint: '將字母按Z字形分3行排列：第1行(位置0,4,8...)，第2行(位置1,3,5...)，第3行(位置2,6,10...)'
@@ -235,7 +158,6 @@ function initializeCTFChallenges() {
             category: 'crypto',
             title: 'Playfair Cipher',
             description: '解碼這段Playfair密碼，密鑰矩陣的關鍵詞是"CSFHK"：\n密文：QB QZ FB ZQ QF BF QZ QF\n提示：I和J視為同一字母',
-            flag: obfuscatedFlags[16],
             difficulty: 'hard',
             points: 45,
             hint: 'Playfair密碼使用5x5矩陣，將字母對進行替換'
@@ -245,7 +167,6 @@ function initializeCTFChallenges() {
             category: 'crypto',
             title: 'Multi-Base Challenge',
             description: '這段文字經過Base64編碼：\nQ1NGSEt7bXVsdGliYXNlfQ==\n解碼後即可得到flag',
-            flag: obfuscatedFlags[17],
             difficulty: 'hard',
             points: 40,
             hint: '直接使用Base64解碼工具或JavaScript atob()函數'
@@ -255,7 +176,6 @@ function initializeCTFChallenges() {
             category: 'crypto',
             title: 'RSA Mini Challenge',
             description: '這是一個簡化的RSA加密挑戰：\nn = 77, e = 7, c = 68\n求解明文m（答案轉換為字母，a=1, b=2...，然後轉換為flag格式）',
-            flag: obfuscatedFlags[18],
             difficulty: 'hard',
             points: 50,
             hint: 'n=77=7*11，phi(n)=60，計算私鑰d=43，然後用m = c^d mod n = 68^43 mod 77 = 19，對應字母s'
@@ -265,7 +185,6 @@ function initializeCTFChallenges() {
             category: 'crypto',
             title: 'Substitution Cipher',
             description: '解碼這段簡單替換密碼：\nXZT YJH YJH QZR ZH YJH ZJHT ZQKFX\n提示：這是一個單字母替換密碼，分析字母頻率',
-            flag: obfuscatedFlags[19],
             difficulty: 'hard',
             points: 38,
             hint: '使用字母頻率分析，最常見的字母通常是E、T、A等'
@@ -275,7 +194,6 @@ function initializeCTFChallenges() {
             category: 'crypto',
             title: 'XOR Cipher',
             description: '這段文字被XOR加密，密鑰是"HKG"（循環使用）：\n密文（hex）：0b180100003c30243517282e3823223a36\n提示：將hex轉換為bytes，每個byte與對應位置的密鑰byte（H=72, K=75, G=71）進行XOR',
-            flag: obfuscatedFlags[20],
             difficulty: 'hard',
             points: 42,
             hint: '將hex轉換為bytes，每個byte與對應位置的密鑰byte進行XOR運算'
@@ -285,7 +203,6 @@ function initializeCTFChallenges() {
             category: 'crypto',
             title: 'Affine Cipher',
             description: '解碼這段仿射密碼：\n密文：SUHRG{Lcipv_za_xcspyfz}\n加密公式：(a*x + b) mod 26，其中a=5, b=8\n提示：需要計算a的模逆元（5^(-1) mod 26 = 21）',
-            flag: obfuscatedFlags[21],
             difficulty: 'hard',
             points: 43,
             hint: '解密公式：x = a^(-1) * (y - b) mod 26，其中a^(-1) = 21'
@@ -295,7 +212,6 @@ function initializeCTFChallenges() {
             category: 'crypto',
             title: 'Multi-Layer Encoding',
             description: '這段文字經過三重編碼：\n1. Base64編碼\n2. 轉換為十六進制\n3. 字符串反轉\n密文（hex，已反轉）：9346d62607252326a65375a566a485a55364742666c67446376585267347543574e41315\n提示：需要按照相反順序解碼',
-            flag: obfuscatedFlags[22],
             difficulty: 'hard',
             points: 55,
             hint: '先將hex反轉，再hex轉ASCII，最後Base64解碼'
@@ -305,7 +221,6 @@ function initializeCTFChallenges() {
             category: 'crypto',
             title: 'Double XOR Encryption',
             description: '這段文字被XOR加密了兩次：\n密文（hex）：4353464b4b7b6d766c74695c786f725c6368616f6c656e64657d\n第一次XOR密鑰：KEY1\n第二次XOR密鑰：KEY2\n提示：需要按照相反順序進行兩次XOR解密',
-            flag: obfuscatedFlags[23],
             difficulty: 'hard',
             points: 52,
             hint: '先用KEY2進行XOR，再用KEY1進行XOR（因為XOR是可逆的，順序不影響結果）'
@@ -315,7 +230,6 @@ function initializeCTFChallenges() {
             category: 'crypto',
             title: 'Columnar Transposition',
             description: '解碼這段欄位換位密碼：\n密文：C{mtpiFoaasnHlrni}Ku_stScnroo\n換位密鑰：CSFHK\n提示：需要根據密鑰字母順序重新排列列',
-            flag: obfuscatedFlags[24],
             difficulty: 'hard',
             points: 48,
             hint: '將密文按列排列，然後根據密鑰字母順序重新排列列'
@@ -325,7 +239,6 @@ function initializeCTFChallenges() {
             category: 'crypto',
             title: 'RSA Advanced',
             description: '這是一個更複雜的RSA挑戰：\nn = 323, e = 7, c = 18\n求解明文m（答案轉換為字母，a=1, b=2...，然後轉換為flag格式）\n提示：需要分解n並計算私鑰',
-            flag: obfuscatedFlags[25],
             difficulty: 'hard',
             points: 60,
             hint: 'n=323=17*19，phi(n)=288，計算d=247，m = c^d mod n = 18^247 mod 323 = 18，對應字母r'
@@ -335,7 +248,6 @@ function initializeCTFChallenges() {
             category: 'crypto',
             title: 'Combined Cipher',
             description: '這段文字使用了組合加密：\n1. 先進行Caesar密碼（移位5）\n2. 再進行XOR加密（密鑰：XOR）\n密文（hex）：101719151f29303b203f212132260d30212735252525\n提示：需要按照相反順序解密',
-            flag: obfuscatedFlags[26],
             difficulty: 'hard',
             points: 58,
             hint: '先用XOR密鑰XOR解密，再進行Caesar密碼反向移位（移位-5或+21）'
@@ -345,7 +257,6 @@ function initializeCTFChallenges() {
             category: 'crypto',
             title: 'Reverse Base64',
             description: '這段文字被反轉後再進行Base64編碼：\n密文：fTQ2ZXNhYl9lc3JldmVye0tIRlND\n提示：先Base64解碼，再反轉字符串',
-            flag: obfuscatedFlags[27],
             difficulty: 'hard',
             points: 45,
             hint: 'Base64解碼後得到的字符串需要反轉才能得到原始flag'
@@ -355,7 +266,6 @@ function initializeCTFChallenges() {
             category: 'crypto',
             title: 'Polyalphabetic Cipher',
             description: '解碼這段多字母替換密碼：\n密文：JGSNU{oqbhbpgv_apqgfjyo}\n使用了兩個密鑰：第一個密鑰"HONGKONG"用於前半部分，第二個密鑰"CSFHK"用於後半部分\n提示：需要根據位置選擇正確的密鑰',
-            flag: obfuscatedFlags[28],
             difficulty: 'hard',
             points: 50,
             hint: '將密文分為兩半，前半部分使用HONGKONG密鑰，後半部分使用CSFHK密鑰進行維吉尼亞密碼解密'
@@ -365,7 +275,6 @@ function initializeCTFChallenges() {
             category: 'reverse',
             title: 'Assembly Analysis',
             description: '以下是一段簡單的彙編代碼，分析其功能並找出flag：\nmov eax, 0x43\nmov ebx, 0x53\nmov ecx, 0x46\nmov edx, 0x48\nmov esi, 0x4B\n這些值對應ASCII字符，組合後加上格式即為flag',
-            flag: obfuscatedFlags[29],
             difficulty: 'hard',
             points: 55,
             hint: '0x43=C, 0x53=S, 0x46=F, 0x48=H, 0x4B=K，組合起來加上flag格式'
@@ -375,7 +284,6 @@ function initializeCTFChallenges() {
             category: 'web',
             title: 'JavaScript Deobfuscation',
             description: '這段JavaScript代碼被嚴重混淆：\neval(String.fromCharCode(67,111,110,115,111,108,101,46,108,111,103,40,39,67,83,70,72,75,123,106,115,95,111,98,102,117,115,99,97,116,101,125,39,41,59))\n執行它並找到flag',
-            flag: obfuscatedFlags[30],
             difficulty: 'hard',
             points: 48,
             hint: 'String.fromCharCode將數字轉換為字符，執行後會在控制台輸出flag'
@@ -385,7 +293,6 @@ function initializeCTFChallenges() {
             category: 'misc',
             title: 'Steganography Challenge',
             description: 'Flag隱藏在以下數據中：\n在瀏覽器控制台執行以下代碼來提取flag：\natob("Q1NGSEt7c3RlZ2Fub2dyYXBoeX0=")',
-            flag: obfuscatedFlags[31],
             difficulty: 'hard',
             points: 40,
             hint: '使用JavaScript的atob()函數解碼Base64字符串'
@@ -512,7 +419,7 @@ function showHint(challengeId) {
     }
 }
 
-function submitFlag(challengeId) {
+async function submitFlag(challengeId) {
     const challenge = ctfChallenges.find(c => c.id === challengeId);
     if (!challenge) return;
     
@@ -534,46 +441,51 @@ function submitFlag(challengeId) {
     }
     
     const inputElement = document.getElementById(`flag-input-${challengeId}`);
-    const userFlag = inputElement.value.trim();
+    const userFlag = inputElement ? inputElement.value.trim() : '';
     
     if (!userFlag) {
         showNotification('請輸入Flag', 'error');
         return;
     }
-    
-    // 解密儲存的 flag
-    const correctFlag = deobfuscateFlag(challenge.flag);
-    
-    if (!correctFlag) {
-        showNotification('系統錯誤，請稍後再試', 'error');
-        return;
-    }
-    
-    // 進行比對（忽略格式差異）
-    const normalizedUserFlag = userFlag.toLowerCase().replace(/[-\s{}]/g, '');
-    const normalizedCorrectFlag = correctFlag.toLowerCase().replace(/[-\s{}]/g, '');
-    
-    if (normalizedUserFlag === normalizedCorrectFlag) {
-        if (!completedChallenges.includes(challengeId)) {
-            completedChallenges.push(challengeId);
-            saveCompletedChallenges();
-            showNotification(`🎉 正確！獲得 ${challenge.points} 分！`, 'success');
-            renderCTFChallenges();
-            updateStats();
-            if (inputElement) {
-                inputElement.value = '';
+
+    try {
+        const response = await fetch('ctf_check.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                id: challengeId,
+                flag: userFlag
+            })
+        });
+
+        const result = await response.json();
+
+        if (result.ok) {
+            if (!completedChallenges.includes(challengeId)) {
+                completedChallenges.push(challengeId);
+                saveCompletedChallenges();
+                showNotification(`🎉 正確！獲得 ${challenge.points} 分！`, 'success');
+                renderCTFChallenges();
+                updateStats();
+                if (inputElement) {
+                    inputElement.value = '';
+                }
+            } else {
+                showNotification('此挑戰已完成', 'info');
             }
         } else {
-            showNotification('此挑戰已完成', 'info');
+            showNotification('Flag 不正確，請再試試', 'error');
+            if (inputElement) {
+                inputElement.style.borderColor = 'var(--danger)';
+                setTimeout(() => {
+                    inputElement.style.borderColor = '';
+                }, 2000);
+            }
         }
-    } else {
-        showNotification('Flag 不正確，請再試試', 'error');
-        if (inputElement) {
-            inputElement.style.borderColor = 'var(--danger)';
-            setTimeout(() => {
-                inputElement.style.borderColor = '';
-            }, 2000);
-        }
+    } catch (e) {
+        showNotification('伺服器錯誤，請稍後再試', 'error');
     }
 }
 
@@ -665,7 +577,6 @@ function setupCTFSpecialFeatures() {
 document.addEventListener('DOMContentLoaded', function() {
     initializeCTFStorage();
     initializeCTFChallenges();
-    addHiddenFlagComment();
     setupCTFSpecialFeatures();
     updateStats();
     
@@ -678,3 +589,5 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 });
+
+
