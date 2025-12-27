@@ -2,8 +2,10 @@
 // 討論區頁面：顯示及管理討論主題與回覆
 define('IN_APP', true);
 
-// Set security headers
+// Set security headers and encrypted transmission
 require_once __DIR__ . '/security/security_headers.php';
+require_once __DIR__ . '/security/encrypted_transmission.php';
+EncryptedTransmission::init(); // Initialize encrypted transmission first
 SecurityHeaders::setAll();
 
 require __DIR__ . '/config/config.php';
@@ -494,5 +496,7 @@ if ($testDbMode) {
     <?php endif; ?>
 </body>
 </html>
+
+
 
 
