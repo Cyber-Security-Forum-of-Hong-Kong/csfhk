@@ -66,7 +66,16 @@ function getDBConnection() {
     static $connection = null;
     
     if ($connection === null) {
-        $connection = @new mysqli($DB_HOST, $DB_USER, $DB_PASS, $DB_NAME);
+        // Try encrypted connection if SSL is configured
+        if (class_exists('EncryptedTransmission') && getenv('DB_SSL_ENABLED') === 'true') {
+            $connection = EncryptedTransmission::getEncryptedDBConnection($DB_HOST, $DB_USER, $DB_PASS, $DB_NAME);
+            if ($connection === null) {
+                // Fallback to regular connection if SSL fails
+                $connection = @new mysqli($DB_HOST, $DB_USER, $DB_PASS, $DB_NAME);
+            }
+        } else {
+            $connection = @new mysqli($DB_HOST, $DB_USER, $DB_PASS, $DB_NAME);
+        }
         
         if ($connection->connect_errno) {
             // Store the error for later retrieval
