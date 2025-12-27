@@ -15,6 +15,7 @@ require __DIR__ . '/security/request_signature.php';
 require __DIR__ . '/security/security_headers.php';
 require __DIR__ . '/security/file_integrity.php';
 require __DIR__ . '/security/encryption.php';
+require __DIR__ . '/security/encrypted_transmission.php';
 require __DIR__ . '/security/database_monitor.php';
 require __DIR__ . '/security/threat_response.php';
 require __DIR__ . '/security/security_audit.php';
@@ -35,6 +36,7 @@ require __DIR__ . '/security/threat_intelligence.php';
 require __DIR__ . '/security/automated_response.php';
 
 // Initialize all security plugins
+EncryptedTransmission::init(); // Initialize encrypted transmission first
 SecurityHeaders::setAll(); // Set security headers immediately
 SecurityMonitor::init();
 BotDetection::init();
@@ -689,5 +691,6 @@ if ($action === 'delete' && $method === 'POST') {
 }
 
 json_error('Unsupported action or method', 405);
+
 
 
