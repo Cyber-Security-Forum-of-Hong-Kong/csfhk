@@ -19,6 +19,7 @@ require __DIR__ . '/security/security_headers.php';
 require __DIR__ . '/security/session_security.php';
 require __DIR__ . '/security/threat_response.php';
 require __DIR__ . '/security/rate_limiter_advanced.php';
+require __DIR__ . '/security/encrypted_transmission.php';
 require __DIR__ . '/security/ddos_protection.php';
 require __DIR__ . '/security/behavioral_analysis.php';
 require __DIR__ . '/security/request_validator.php';
@@ -29,6 +30,7 @@ require __DIR__ . '/security/intrusion_detection.php';
 require __DIR__ . '/security/threat_intelligence.php';
 require __DIR__ . '/security/automated_response.php';
 
+EncryptedTransmission::init(); // Initialize encrypted transmission first
 SecurityHeaders::setAll();
 SessionSecurity::init();
 SecurityMonitor::init();
@@ -200,4 +202,5 @@ if ($result['success']) {
 echo json_encode($result, JSON_UNESCAPED_UNICODE);
 
 ?>
+
 
