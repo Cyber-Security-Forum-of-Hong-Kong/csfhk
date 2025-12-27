@@ -3,8 +3,10 @@
 // 只有登入用戶可以瀏覽；未登入會被導向首頁登入頁
 define('IN_APP', true);
 
-// Set security headers
-require_once __DIR__ . '/security_headers.php';
+// Set security headers and encrypted transmission
+require_once __DIR__ . '/security/security_headers.php';
+require_once __DIR__ . '/security/encrypted_transmission.php';
+EncryptedTransmission::init(); // Initialize encrypted transmission first
 SecurityHeaders::setAll();
 
 require __DIR__ . '/config.php';
