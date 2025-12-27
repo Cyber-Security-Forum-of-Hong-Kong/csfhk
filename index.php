@@ -2,8 +2,10 @@
 // index.php - PHP 版本首頁，內容與原本 index.html 相同
 define('IN_APP', true);
 
-// Set security headers
+// Set security headers and encrypted transmission
 require_once __DIR__ . '/security/security_headers.php';
+require_once __DIR__ . '/security/encrypted_transmission.php';
+EncryptedTransmission::init(); // Initialize encrypted transmission first
 SecurityHeaders::setAll();
 
 require __DIR__ . '/config/config.php';
