@@ -1,6 +1,6 @@
 <?php
 /**
- * Login Handler
+ * Signup Handler
  */
 
 // Define constant to allow included files
@@ -73,6 +73,13 @@ if (!AdvancedSecurity::validateHeaders()) {
     exit;
 }
 
+// Validate input lengths
+if (!AdvancedSecurity::validateInputLengths(['name' => 50, 'email' => 255])) {
+    http_response_code(413);
+    echo json_encode(['success' => false, 'message' => 'Input too long']);
+    exit;
+}
+
 // Detect anomalies
 if (!AdvancedSecurity::detectAnomalies()) {
     http_response_code(403);
@@ -85,20 +92,8 @@ AdvancedSecurity::recordRequest();
 
 // Check IP reputation
 $clientIP = Security::getClientIP();
-
-// Threat intelligence check
-$threatCheck = ThreatIntelligence::checkIP($clientIP);
-if ($threatCheck['threat']) {
-    SecurityMonitor::logEvent('THREAT_INTELLIGENCE_MATCH', 'high', 
-        "Threat intelligence match on login: " . $threatCheck['reason']);
-    AutomatedResponse::handleThreat('THREAT_INTELLIGENCE', $threatCheck['severity'], ['ip' => $clientIP]);
-    http_response_code(403);
-    echo json_encode(['success' => false, 'message' => 'Access denied']);
-    exit;
-}
-
 if (IPReputation::isBlacklisted($clientIP)) {
-    SecurityMonitor::logEvent('BLACKLISTED_IP', 'high', "Blacklisted IP attempted login: $clientIP");
+    SecurityMonitor::logEvent('BLACKLISTED_IP', 'high', "Blacklisted IP attempted signup: $clientIP");
     http_response_code(403);
     echo json_encode(['success' => false, 'message' => 'Access denied']);
     exit;
@@ -106,38 +101,27 @@ if (IPReputation::isBlacklisted($clientIP)) {
 
 // Bot detection
 if (BotDetection::isBot(true)) {
-    SecurityMonitor::logEvent('BOT_DETECTED', 'medium', "Bot detected on login: " . ($_SERVER['HTTP_USER_AGENT'] ?? 'Unknown'));
+    SecurityMonitor::logEvent('BOT_DETECTED', 'medium', "Bot detected on signup: " . ($_SERVER['HTTP_USER_AGENT'] ?? 'Unknown'));
     IPReputation::updateReputation($clientIP, -10);
     http_response_code(403);
     echo json_encode(['success' => false, 'message' => 'Access denied']);
     exit;
 }
 
-// Check honeypot (if form has it)
+// Check honeypot
 if (!BotDetection::checkHoneypot('website')) {
-    SecurityMonitor::logEvent('HONEYPOT_CATCH', 'high', "Honeypot triggered on login");
+    SecurityMonitor::logEvent('HONEYPOT_CATCH', 'high', "Honeypot triggered on signup");
     IPReputation::updateReputation($clientIP, -30);
     http_response_code(403);
     echo json_encode(['success' => false, 'message' => 'Invalid request']);
     exit;
 }
 
-// Intrusion Detection System scan
-if (!IntrusionDetection::scanRequest()) {
-    SecurityMonitor::logEvent('IDS_BLOCKED', 'critical', "IDS blocked login from: $clientIP");
-    SecurityCorrelation::correlate('IDS_DETECTION', ['ip' => $clientIP, 'action' => 'login']);
-    AutomatedResponse::handleThreat('INTRUSION_DETECTED', 'critical', ['ip' => $clientIP]);
-    http_response_code(403);
-    echo json_encode(['success' => false, 'message' => 'Access denied']);
-    exit;
-}
-
 WAF::init();
 if (!WAF::checkRequest()) {
     // Request was blocked by WAF
-    SecurityMonitor::logEvent('WAF_BLOCKED', 'high', "WAF blocked login from: $clientIP");
-    SecurityCorrelation::correlate('WAF_BLOCKED', ['ip' => $clientIP, 'action' => 'login']);
-    AutomatedResponse::handleThreat('WAF_BLOCKED', 'high', ['ip' => $clientIP]);
+    SecurityMonitor::logEvent('WAF_BLOCKED', 'high', "WAF blocked signup from: $clientIP");
+    SecurityCorrelation::correlate('WAF_BLOCKED', ['ip' => $clientIP, 'action' => 'signup']);
     IPReputation::updateReputation($clientIP, -15);
     exit;
 }
@@ -147,9 +131,9 @@ require __DIR__ . '/auth.php';
 header('Content-Type: application/json; charset=utf-8');
 
 // Advanced rate limiting
-if (!AdvancedRateLimiter::checkLimit('login')) {
-    SecurityCorrelation::correlate('RATE_LIMIT_EXCEEDED', ['ip' => $clientIP, 'action' => 'login']);
-    $remaining = AdvancedRateLimiter::getRemaining('login');
+if (!AdvancedRateLimiter::checkLimit('signup')) {
+    SecurityCorrelation::correlate('RATE_LIMIT_EXCEEDED', ['ip' => $clientIP, 'action' => 'signup']);
+    $remaining = AdvancedRateLimiter::getRemaining('signup');
     http_response_code(429);
     echo json_encode(['success' => false, 'message' => "Too many requests. Please try again later."]);
     exit;
@@ -165,10 +149,10 @@ if ($behaviorAnalysis['risk_score'] > 60) {
 }
 
 // Start timing analysis
-TimingAnalysis::start('login_attempt');
+TimingAnalysis::start('signup_attempt');
 
 // Check request size
-Security::checkRequestSize(10240); // 10KB max for login
+Security::checkRequestSize(10240); // 10KB max for signup
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
@@ -184,19 +168,21 @@ if (!Security::verifyCSRFToken($csrfToken)) {
     exit;
 }
 
-$email = Security::sanitizeInput($_POST['email'] ?? '', 'email');
+$name = Security::sanitizeInput(trim($_POST['name'] ?? ''), 'string');
+$email = Security::sanitizeInput(trim($_POST['email'] ?? ''), 'email');
 $password = $_POST['password'] ?? '';
+$confirmPassword = $_POST['confirm_password'] ?? '';
 
-$result = loginUser($email, $password);
+$result = signupUser($name, $email, $password, $confirmPassword);
 
 // End timing analysis
-TimingAnalysis::end('login_attempt');
+TimingAnalysis::end('signup_attempt');
 
-// Correlate login result
+// Correlate signup result
 if ($result['success']) {
-    SecurityCorrelation::correlate('SUCCESSFUL_LOGIN', ['ip' => $clientIP, 'email' => $email]);
+    SecurityCorrelation::correlate('SUCCESSFUL_SIGNUP', ['ip' => $clientIP, 'email' => $email]);
 } else {
-    SecurityCorrelation::correlate('FAILED_LOGIN', ['ip' => $clientIP, 'email' => $email]);
+    SecurityCorrelation::correlate('FAILED_SIGNUP', ['ip' => $clientIP, 'email' => $email]);
 }
 
 echo json_encode($result, JSON_UNESCAPED_UNICODE);
